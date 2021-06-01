@@ -23,19 +23,21 @@
         </dependency>
         <!-- start of kafka dependencies  -->
 
-        <!-- start of lombok dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
-            <scope>provided</scope>
         </dependency>
-        <!-- end of lombok dependencies -->
 
         <!-- start of slf4j dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
         </dependency>
         <!-- end of slf4j dependencies -->

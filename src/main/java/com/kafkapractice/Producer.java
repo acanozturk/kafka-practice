@@ -2,9 +2,7 @@ package com.kafkapractice;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
@@ -18,9 +16,21 @@ public class Producer {
 
         final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-        final ProducerRecord<String, String> record = new ProducerRecord<>("first_topic", "test_message");
+        final Callback callback = (recordMetadata, exception) -> {
+            if(exception == null) {
+                log.info(fillMetadataLogInfo(recordMetadata));
+            } else {
+                log.error("Error while producing!", exception);
+            }
+        };
 
-        producer.send(record);
+        for(int i=0; i<10; i++) {
+            final ProducerRecord<String, String> record = new ProducerRecord<>(
+                    "first_topic", "test" + i);
+
+            producer.send(record, callback);
+        }
+
         producer.flush();
         producer.close();
     }
@@ -38,4 +48,11 @@ public class Producer {
         return properties;
     }
 
+    private static String fillMetadataLogInfo(final RecordMetadata recordMetadata) {
+
+        return "Received new metadata. \n" +
+               "Topic: " + recordMetadata.topic() + "\n" +
+               "Partition: " + recordMetadata.partition() + "\n" +
+               "Offset: " + recordMetadata.offset() + "\n";
+    }
 }
