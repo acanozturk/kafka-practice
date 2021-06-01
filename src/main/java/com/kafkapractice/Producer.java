@@ -11,6 +11,9 @@ import java.util.Properties;
 @Slf4j
 public class Producer {
 
+    private final static String BOOTSTRAP_SERVER = "127.0.0.1:9092";
+    private final static String SERIALIZER = StringSerializer.class.getName();
+
     public static void main(String[] args) {
         final Properties properties = setProperties();
 
@@ -25,8 +28,13 @@ public class Producer {
         };
 
         for(int i=0; i<10; i++) {
-            final ProducerRecord<String, String> record = new ProducerRecord<>(
-                    "first_topic", "test" + i);
+            String topic = "first_topic";
+            String key = "key_" + i;
+            String value = "value_" + i;
+
+            final ProducerRecord<String, String> record = new ProducerRecord<>(topic, key ,value);
+
+            log.info("Key: " + key);
 
             producer.send(record, callback);
         }
@@ -36,9 +44,6 @@ public class Producer {
     }
 
     private static Properties setProperties() {
-        final String BOOTSTRAP_SERVER = "127.0.0.1:9092";
-        final String SERIALIZER = StringSerializer.class.getName();
-
         final Properties properties = new Properties();
 
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
@@ -50,7 +55,7 @@ public class Producer {
 
     private static String fillMetadataLogInfo(final RecordMetadata recordMetadata) {
 
-        return "Received new metadata. \n" +
+        return "\nReceived new metadata. \n" +
                "Topic: " + recordMetadata.topic() + "\n" +
                "Partition: " + recordMetadata.partition() + "\n" +
                "Offset: " + recordMetadata.offset() + "\n";
