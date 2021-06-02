@@ -45,7 +45,7 @@ public class Consumer {
 
     private static String fillRecordLogInfo(final ConsumerRecord<String, String> record) {
 
-        return  "\nReceived new metadata. \n" +
+        return  "\nConsumed new data. \n" +
                 "Topic: " + record.topic() + "\n" +
                 "Partition: " + record.partition() + "\n" +
                 "Offset: " + record.offset() + "\n" +
