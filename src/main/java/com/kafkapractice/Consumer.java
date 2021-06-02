@@ -6,8 +6,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -24,11 +26,35 @@ public class Consumer {
 
         consumer.subscribe(Collections.singletonList(KAFKA_TOPIC));
 
+        final TopicPartition partition = new TopicPartition(KAFKA_TOPIC, 0);
+        long partitionOffset = 15L;
+
+//        int messagesRead = 0;
+//        int messagesToRead = 5;
+//        boolean readMessages = true;
+
+//        consumer.assign(Collections.singletonList(partition));
+//        consumer.seek(partition, partitionOffset);
+
         while(true) {
             final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
             records.forEach(record -> log.info(fillRecordLogInfo(record)));
         }
+
+//        while(readMessages) {
+//            final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+//
+//            for(ConsumerRecord<String, String> record : records) {
+//                log.info(fillRecordLogInfo(record));
+//                messagesRead++;
+//
+//                if(messagesRead >= messagesToRead) {
+//                    readMessages = false;
+//                    break;
+//                }
+//            }
+//        }
     }
 
     private static Properties setProperties() {
@@ -37,7 +63,7 @@ public class Consumer {
         newProperties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
         newProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, DESERIALIZER);
         newProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, DESERIALIZER);
-        newProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP);
+        newProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_ID);
         newProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return newProperties;
