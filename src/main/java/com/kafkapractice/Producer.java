@@ -3,16 +3,14 @@ package com.kafkapractice;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
+
+import static com.kafkapractice.Config.*;
 
 @Data
 @Slf4j
 public class Producer {
-
-    private final static String BOOTSTRAP_SERVER = "127.0.0.1:9092";
-    private final static String SERIALIZER = StringSerializer.class.getName();
 
     public static void main(String[] args) {
         final Properties properties = setProperties();
@@ -28,11 +26,10 @@ public class Producer {
         };
 
         for(int i=0; i<10; i++) {
-            String topic = "first_topic";
             String key = "key_" + i;
             String value = "value_" + i;
 
-            final ProducerRecord<String, String> record = new ProducerRecord<>(topic, key ,value);
+            final ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, key ,value);
 
             log.info("Key: " + key);
 
@@ -44,13 +41,13 @@ public class Producer {
     }
 
     private static Properties setProperties() {
-        final Properties properties = new Properties();
+        final Properties newProperties = new Properties();
 
-        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
-        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, SERIALIZER);
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, SERIALIZER);
+        newProperties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
+        newProperties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, SERIALIZER);
+        newProperties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, SERIALIZER);
 
-        return properties;
+        return newProperties;
     }
 
     private static String fillMetadataLogInfo(final RecordMetadata recordMetadata) {
