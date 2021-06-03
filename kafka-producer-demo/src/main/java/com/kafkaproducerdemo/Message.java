@@ -2,21 +2,20 @@ package com.kafkaproducerdemo;
 
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 @Data
 @EqualsAndHashCode
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message implements Serializable {
+public class Message{
 
-    static final long serialVersionUID = 42L;
-
-    private UUID uuid;
+    private String url;
+    private String id;
+    private String user;
     private Date timestamp;
     private String message;
+
 
 }

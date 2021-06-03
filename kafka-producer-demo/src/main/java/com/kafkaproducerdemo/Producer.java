@@ -30,9 +30,7 @@ public class Producer {
             producer.close();
         }));
 
-        client.setDelimiter(100000);
-
-        for(int i=0; i<client.getDelimiter(); i++) {
+        for(int i=0; i<10000; i++) {
             final String event = client.createEvent();
 
             final ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, null , event);

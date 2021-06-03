@@ -13,6 +13,7 @@
     <modules>
         <module>kafka-basics</module>
         <module>kafka-producer-demo</module>
+        <module>kafka-consumer-elasticsearch</module>
     </modules>
 
     <properties>
