@@ -12,8 +12,9 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -39,28 +40,30 @@ public class ConsumerElasticSearch {
 
         while(true) {
             final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-            log.info("Received records: " + records.count());
+
+            final int recordsCount = records.count();
+            log.info("Received records: " + recordsCount);
+
+            final BulkRequest bulkRequest = new BulkRequest();
 
             for(ConsumerRecord<String, String> record : records) {
                 final String value = record.value();
                 final String id = JsonParser.parseString(value).getAsJsonObject().get("id").getAsString();
 
-                final IndexRequest request = new IndexRequest("consumer").id(id).source(value, XContentType.JSON);
-                final IndexResponse response = client.index(request, RequestOptions.DEFAULT);
+                final IndexRequest indexRequest = new IndexRequest("consumer").id(id).source(value, XContentType.JSON);
 
-                log.info(response.getId());
+                bulkRequest.add(indexRequest);
 
-                Thread.sleep(100);
-
-                log.info("Committing offsets..");
-                consumer.commitSync();
-                log.info("Offsets have been committed.");
-
-                Thread.sleep(500);
+                if(recordsCount > 0) {
+                    final BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    log.info("Committing offsets..");
+                    consumer.commitSync();
+                    log.info("Offsets have been committed.");
+                    Thread.sleep(1000);
+                }
             }
         }
 
-        //client.close();
     }
 
     public static RestHighLevelClient createClient() {
@@ -98,7 +101,7 @@ public class ConsumerElasticSearch {
         newProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_ID);
         newProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         newProperties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        newProperties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
+        newProperties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
 
         return newProperties;
     }

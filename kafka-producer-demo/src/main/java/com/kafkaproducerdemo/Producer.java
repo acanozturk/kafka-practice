@@ -36,7 +36,7 @@ public class Producer {
 
             producer.send(record, callback);
 
-            Thread.sleep(ThreadLocalRandom.current().nextInt(100, 300));
+            Thread.sleep(ThreadLocalRandom.current().nextInt(100, 500));
         }
     }
 
