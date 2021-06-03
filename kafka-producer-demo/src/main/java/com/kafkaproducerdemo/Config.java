@@ -1,4 +1,4 @@
-package com.kafkapractice;
+package com.kafkaproducerdemo;
 
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;

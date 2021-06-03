@@ -1,6 +1,9 @@
-package com.kafkapractice;
+package com.kafkaproducerdemo;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -11,6 +14,8 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 public class MockClient {
+
+    private long delimiter;
 
     public String createEvent() {
         final Message message = new Message();

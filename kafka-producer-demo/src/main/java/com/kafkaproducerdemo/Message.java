@@ -1,4 +1,4 @@
-package com.kafkapractice;
+package com.kafkaproducerdemo;
 
 import lombok.*;
 
