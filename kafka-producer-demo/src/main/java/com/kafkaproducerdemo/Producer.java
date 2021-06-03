@@ -32,14 +32,11 @@ public class Producer {
 
         for(int i=0; i<10000; i++) {
             final String event = client.createEvent();
-
             final ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, null , event);
 
             producer.send(record, callback);
 
-            final int sleep = ThreadLocalRandom.current().nextInt(10, 300);
-
-            Thread.sleep(sleep);
+            Thread.sleep(ThreadLocalRandom.current().nextInt(100, 300));
         }
     }
 

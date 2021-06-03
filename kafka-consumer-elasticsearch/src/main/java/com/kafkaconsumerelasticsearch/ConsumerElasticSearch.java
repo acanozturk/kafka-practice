@@ -1,13 +1,12 @@
 package com.kafkaconsumerelasticsearch;
 
+import com.google.gson.JsonParser;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -40,15 +39,24 @@ public class ConsumerElasticSearch {
 
         while(true) {
             final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+            log.info("Received records: " + records.count());
 
             for(ConsumerRecord<String, String> record : records) {
-                final IndexRequest request = new IndexRequest("consumer", "events")
-                        .source(record.value(), XContentType.JSON);
+                final String value = record.value();
+                final String id = JsonParser.parseString(value).getAsJsonObject().get("id").getAsString();
+
+                final IndexRequest request = new IndexRequest("consumer").id(id).source(value, XContentType.JSON);
                 final IndexResponse response = client.index(request, RequestOptions.DEFAULT);
 
                 log.info(response.getId());
 
-                Thread.sleep(1000);
+                Thread.sleep(100);
+
+                log.info("Committing offsets..");
+                consumer.commitSync();
+                log.info("Offsets have been committed.");
+
+                Thread.sleep(500);
             }
         }
 
@@ -89,6 +97,8 @@ public class ConsumerElasticSearch {
         newProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, DESERIALIZER);
         newProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_ID);
         newProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        newProperties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        newProperties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
 
         return newProperties;
     }

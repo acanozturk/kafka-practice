@@ -7,15 +7,14 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class Message{
+public class Message {
 
     private String url;
     private String id;
+    private String city;
     private String user;
+    private String email;
     private Date timestamp;
     private String message;
-
 
 }

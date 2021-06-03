@@ -18,7 +18,6 @@ import static net.andreinc.mockneat.types.enums.URLSchemeType.HTTPS;
 @Data
 @EqualsAndHashCode
 @ToString
-@NoArgsConstructor
 public class MockClient {
 
     private final MockNeat mockNeat = MockNeat.threadLocal();
@@ -30,7 +29,9 @@ public class MockClient {
                 reflect(Message.class)
                 .field("url", mockNeat.urls().scheme(HTTPS).domain(POPULAR).host(ADVERB_VERB))
                 .field("id", mockNeat.uuids())
+                .field("city", mockNeat.cities().capitals().get())
                 .field("user", mockNeat.names().full())
+                .field("email", mockNeat.emails())
                 .field("timestamp", new Date())
                 .field("message", mockNeat.markovs().type(MarkovChainType.LOREM_IPSUM))
                 .map(gson::toJson)
