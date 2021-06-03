@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.*;
 
 import java.util.Properties;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.kafkapractice.Config.*;
 
@@ -12,32 +13,46 @@ import static com.kafkapractice.Config.*;
 @Slf4j
 public class Producer {
 
-    public static void main(String[] args) {
-        final Properties properties = setProperties();
-
-        final KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
-
+    public static void main(String[] args) throws InterruptedException {
+        final MockClient client = mockClient();
+        final KafkaProducer<String, String> producer = createKafkaProducer();
         final Callback callback = (recordMetadata, exception) -> {
-            if(exception == null) {
+            if (exception == null) {
                 log.info(fillMetadataLogInfo(recordMetadata));
             } else {
                 log.error("Error while producing!", exception);
             }
         };
 
-        for(int i=0; i<10; i++) {
-            String key = "key_" + i;
-            String value = "value_" + i;
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("shutting down the app..");
+            producer.flush();
+            producer.close();
+            log.info("shut down successful..");
+        }));
 
-            final ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, key ,value);
+        for(int i=0; i<10000; i++) {
+            final String event = client.createEvent();
 
-            log.info("Key: " + key);
+            final ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, null , event);
 
             producer.send(record, callback);
-        }
 
-        producer.flush();
-        producer.close();
+            final int sleep = ThreadLocalRandom.current().nextInt(10, 300);
+
+            Thread.sleep(sleep);
+        }
+    }
+
+    public static MockClient mockClient() {
+
+        return new MockClient();
+    }
+
+    public static KafkaProducer<String, String> createKafkaProducer() {
+        final Properties properties = setProperties();
+
+        return new KafkaProducer<>(properties);
     }
 
     private static Properties setProperties() {
@@ -53,8 +68,8 @@ public class Producer {
     private static String fillMetadataLogInfo(final RecordMetadata recordMetadata) {
 
         return "\nReceived new metadata. \n" +
-               "Topic: " + recordMetadata.topic() + "\n" +
-               "Partition: " + recordMetadata.partition() + "\n" +
-               "Offset: " + recordMetadata.offset() + "\n";
+                "Topic: " + recordMetadata.topic() + "\n" +
+                "Partition: " + recordMetadata.partition() + "\n" +
+                "Offset: " + recordMetadata.offset() + "\n";
     }
 }
