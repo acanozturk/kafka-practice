@@ -26,7 +26,7 @@ public class MockClient {
     public String createEvent() {
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        final String json = mockNeat.
+        return mockNeat.
                 reflect(Message.class)
                 .field("url", mockNeat.urls().scheme(HTTPS).domain(POPULAR).host(ADVERB_VERB))
                 .field("id", mockNeat.uuids())
@@ -35,7 +35,5 @@ public class MockClient {
                 .field("message", mockNeat.markovs().type(MarkovChainType.LOREM_IPSUM))
                 .map(gson::toJson)
                 .val();
-
-        return json;
     }
 }
