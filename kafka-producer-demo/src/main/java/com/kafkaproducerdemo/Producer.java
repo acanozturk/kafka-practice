@@ -14,25 +14,15 @@ import static com.kafkaproducerdemo.Config.*;
 public class Producer {
 
     public static void main(String[] args) throws InterruptedException {
-        final MockClient client = mockClient();
+        final MockClient client = createMockClient();
         final KafkaProducer<String, String> producer = createKafkaProducer();
-        final Callback callback = (recordMetadata, exception) -> {
-            if (exception == null) {
-                log.info(fillMetadataLogInfo(recordMetadata));
-            } else {
-                log.error("Error while producing!", exception);
-            }
-        };
+        final Callback callback = createCallback();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("shutting down the app..");
-            producer.flush();
-            producer.close();
-        }));
+        shutdownHook(producer);
 
         for(int i=0; i<10000; i++) {
             final String event = client.createEvent();
-            final ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC, null , event);
+            final ProducerRecord<String, String> record = createProducerRecord(event);
 
             producer.send(record, callback);
 
@@ -40,7 +30,7 @@ public class Producer {
         }
     }
 
-    public static MockClient mockClient() {
+    public static MockClient createMockClient() {
 
         return new MockClient();
     }
@@ -49,6 +39,17 @@ public class Producer {
         final Properties producerProperties = setProperties();
 
         return new KafkaProducer<>(producerProperties);
+    }
+
+    private static Callback createCallback() {
+
+        return (recordMetadata, exception) -> {
+            if (exception == null) {
+                log.info(fillMetadataLogInfo(recordMetadata));
+            } else {
+                log.error("Error while producing!", exception);
+            }
+        };
     }
 
     private static Properties setProperties() {
@@ -76,4 +77,17 @@ public class Producer {
                 "Offset: " + recordMetadata.offset() + "\n";
     }
 
+    private static void shutdownHook(final KafkaProducer<String, String> producer) {
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("shutting down the app..");
+            producer.flush();
+            producer.close();
+        }));
+    }
+
+    private static ProducerRecord<String, String> createProducerRecord(final String event) {
+
+        return new ProducerRecord<>(KAFKA_TOPIC, null , event);
+    }
 }

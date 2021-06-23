@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.andreinc.mockneat.MockNeat;
 import net.andreinc.mockneat.types.enums.MarkovChainType;
@@ -23,7 +22,7 @@ public class MockClient {
     private final MockNeat mockNeat = MockNeat.threadLocal();
 
     public String createEvent() {
-        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        final Gson gson = createGson();
 
         return mockNeat.
                 reflect(Message.class)
@@ -31,10 +30,16 @@ public class MockClient {
                 .field("id", mockNeat.uuids())
                 .field("city", mockNeat.cities().capitals().get())
                 .field("user", mockNeat.names().full())
+                .field("age", mockNeat.ints().range(15,85).get())
                 .field("email", mockNeat.emails())
                 .field("timestamp", new Date())
                 .field("message", mockNeat.markovs().type(MarkovChainType.LOREM_IPSUM))
                 .map(gson::toJson)
                 .val();
+    }
+
+    private Gson createGson() {
+
+        return new GsonBuilder().setPrettyPrinting().create();
     }
 }

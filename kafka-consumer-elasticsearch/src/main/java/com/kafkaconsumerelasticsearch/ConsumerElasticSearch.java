@@ -48,17 +48,19 @@ public class ConsumerElasticSearch {
 
             for(ConsumerRecord<String, String> record : records) {
                 final String value = record.value();
-                final String id = JsonParser.parseString(value).getAsJsonObject().get("id").getAsString();
-
-                final IndexRequest indexRequest = new IndexRequest("consumer").id(id).source(value, XContentType.JSON);
+                final String id = extractId(value);
+                final IndexRequest indexRequest = createIndexRequest(id, value);
 
                 bulkRequest.add(indexRequest);
 
                 if(recordsCount > 0) {
                     final BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
                     log.info("Committing offsets..");
+                    log.info(bulkResponse.toString());
+
                     consumer.commitSync();
                     log.info("Offsets have been committed.");
+
                     Thread.sleep(1000);
                 }
             }
@@ -99,11 +101,23 @@ public class ConsumerElasticSearch {
         newProperties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, DESERIALIZER);
         newProperties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, DESERIALIZER);
         newProperties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_ID);
-        newProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        newProperties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         newProperties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         newProperties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
 
         return newProperties;
     }
 
+    private static String extractId(final String value) {
+
+        return JsonParser.parseString(value)
+                .getAsJsonObject()
+                .get("id")
+                .getAsString();
+    }
+
+    private static IndexRequest createIndexRequest(final String id, final String value) {
+
+        return new IndexRequest("consumer").id(id).source(value, XContentType.JSON);
+    }
 }

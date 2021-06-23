@@ -13,6 +13,7 @@ public class Message {
     private String id;
     private String city;
     private String user;
+    private Integer age;
     private String email;
     private Date timestamp;
     private String message;
