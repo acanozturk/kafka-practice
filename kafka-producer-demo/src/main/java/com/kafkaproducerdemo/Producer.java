@@ -16,19 +16,12 @@ public class Producer {
     public static void main(String[] args) throws InterruptedException {
         final MockClient client = createMockClient();
         final KafkaProducer<String, String> producer = createKafkaProducer();
-        final Callback callback = createCallback();
+
+        startEventProducing(client, producer);
 
         shutdownHook(producer);
-
-        for(int i=0; i<10000; i++) {
-            final String event = client.createEvent();
-            final ProducerRecord<String, String> record = createProducerRecord(event);
-
-            producer.send(record, callback);
-
-            Thread.sleep(ThreadLocalRandom.current().nextInt(100, 500));
-        }
     }
+
 
     public static MockClient createMockClient() {
 
@@ -36,20 +29,8 @@ public class Producer {
     }
 
     public static KafkaProducer<String, String> createKafkaProducer() {
-        final Properties producerProperties = setProperties();
 
-        return new KafkaProducer<>(producerProperties);
-    }
-
-    private static Callback createCallback() {
-
-        return (recordMetadata, exception) -> {
-            if (exception == null) {
-                log.info(fillMetadataLogInfo(recordMetadata));
-            } else {
-                log.error("Error while producing!", exception);
-            }
-        };
+        return new KafkaProducer<>(setProperties());
     }
 
     private static Properties setProperties() {
@@ -69,12 +50,47 @@ public class Producer {
         return properties;
     }
 
+    private static void startEventProducing(final MockClient client,
+            final KafkaProducer<String, String> producer) throws InterruptedException {
+
+        for(int i=0; i<10000; i++) {
+            final String event = client.createEvent();
+            final ProducerRecord<String, String> record = createProducerRecord(event);
+
+            producer.send(record, createCallback());
+
+            applyDelay();
+        }
+
+    }
+
+    private static ProducerRecord<String, String> createProducerRecord(final String event) {
+
+        return new ProducerRecord<>(KAFKA_TOPIC, null , event);
+    }
+
+    private static Callback createCallback() {
+
+        return (recordMetadata, exception) -> {
+            if (exception == null) {
+                log.info(fillMetadataLogInfo(recordMetadata));
+            } else {
+                log.error("Error while producing!", exception);
+            }
+        };
+    }
+
     private static String fillMetadataLogInfo(final RecordMetadata recordMetadata) {
 
         return "\nReceived new metadata. \n" +
                 "Topic: " + recordMetadata.topic() + "\n" +
                 "Partition: " + recordMetadata.partition() + "\n" +
                 "Offset: " + recordMetadata.offset() + "\n";
+    }
+
+    private static void applyDelay() throws InterruptedException {
+
+        Thread.sleep(ThreadLocalRandom.current().nextInt(100, 500));
     }
 
     private static void shutdownHook(final KafkaProducer<String, String> producer) {
@@ -86,8 +102,4 @@ public class Producer {
         }));
     }
 
-    private static ProducerRecord<String, String> createProducerRecord(final String event) {
-
-        return new ProducerRecord<>(KAFKA_TOPIC, null , event);
-    }
 }

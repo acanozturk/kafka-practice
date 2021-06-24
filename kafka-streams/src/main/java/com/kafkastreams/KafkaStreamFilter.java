@@ -17,7 +17,7 @@ import static com.kafkastreams.Config.*;
 public class KafkaStreamFilter {
 
     public static void main(String[] args) {
-        final StreamsBuilder streamsBuilder = new StreamsBuilder();
+        final StreamsBuilder streamsBuilder = createStreamsBuilder();
         final KStream<String, String> stream = streamsBuilder.stream(KAFKA_TOPIC);
         final KStream<String, String> filteredStream = streamFilter(stream);
 
@@ -26,6 +26,11 @@ public class KafkaStreamFilter {
         final KafkaStreams kafkaStreams = createKafkaStreams(streamsBuilder);
 
         kafkaStreams.start();
+    }
+
+    private static StreamsBuilder createStreamsBuilder() {
+
+        return new StreamsBuilder();
     }
 
     private static Properties setProperties() {
