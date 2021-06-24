@@ -22,7 +22,6 @@ public class Producer {
         shutdownHook(producer);
     }
 
-
     public static MockClient createMockClient() {
 
         return new MockClient();
