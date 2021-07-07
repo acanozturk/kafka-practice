@@ -33,17 +33,6 @@ public class KafkaStreamFilter {
         return new StreamsBuilder();
     }
 
-    private static Properties setProperties() {
-        final Properties properties = new Properties();
-
-        properties.setProperty(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
-        properties.setProperty(StreamsConfig.APPLICATION_ID_CONFIG, APPLICATION_ID);
-        properties.setProperty(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, KEY_SERDE);
-        properties.setProperty(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, VALUE_SERDE);
-
-        return properties;
-    }
-
     private static Integer extractAge(final String value) {
 
         return JsonParser.parseString(value)
@@ -62,5 +51,16 @@ public class KafkaStreamFilter {
     private static KafkaStreams createKafkaStreams(final StreamsBuilder streamsBuilders) {
 
         return new KafkaStreams(streamsBuilders.build(), setProperties());
+    }
+
+    private static Properties setProperties() {
+        final Properties properties = new Properties();
+
+        properties.setProperty(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVER);
+        properties.setProperty(StreamsConfig.APPLICATION_ID_CONFIG, APPLICATION_ID);
+        properties.setProperty(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, KEY_SERDE);
+        properties.setProperty(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, VALUE_SERDE);
+
+        return properties;
     }
 }

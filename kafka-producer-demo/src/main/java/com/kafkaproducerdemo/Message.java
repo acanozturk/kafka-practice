@@ -5,8 +5,6 @@ import lombok.*;
 import java.util.Date;
 
 @Data
-@EqualsAndHashCode
-@ToString
 public class Message {
 
     private String url;
