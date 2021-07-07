@@ -49,8 +49,8 @@ public class Producer {
         return properties;
     }
 
-    private static void startEventProducing(final MockClient client,
-            final KafkaProducer<String, String> producer) throws InterruptedException {
+    private static void startEventProducing(final MockClient client, final KafkaProducer<String, String> producer)
+            throws InterruptedException {
 
         for(int i=0; i<10000; i++) {
             final String event = client.createEvent();
@@ -60,7 +60,6 @@ public class Producer {
 
             applyDelay();
         }
-
     }
 
     private static ProducerRecord<String, String> createProducerRecord(final String event) {

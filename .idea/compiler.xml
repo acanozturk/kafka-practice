@@ -10,6 +10,7 @@
         <module name="kafka-streams" />
         <module name="kafka-producer-demo" />
         <module name="kafka-basics" />
+        <module name="kafka-connect-api" />
         <module name="kafka-consumer-elasticsearch" />
       </profile>
     </annotationProcessing>
