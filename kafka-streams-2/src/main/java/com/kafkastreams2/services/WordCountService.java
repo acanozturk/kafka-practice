@@ -12,8 +12,6 @@ import org.apache.kafka.streams.kstream.Produced;
 
 import static com.kafkastreams2.configs.KafkaConfig.FILTERED_KAFKA_TOPIC;
 import static com.kafkastreams2.configs.KafkaConfig.KAFKA_TOPIC;
-import static com.kafkastreams2.services.FilterService.*;
-import static com.kafkastreams2.services.PropertyService.setProperties;
 
 @Data
 @Slf4j
@@ -30,12 +28,12 @@ public class WordCountService {
     }
 
     public static KTable<String, Long> streamFilter(final KStream<String, String> stream) {
-        final KStream<String, String> valuesToLowercase = valuesToLowercase(stream);
-        final KStream<String, String> splitValues = splitValues(valuesToLowercase);
-        final KStream<String, String> assignKeys = assignKeys(splitValues);
-        final KGroupedStream<String, String> groupByKey = groupByKey(assignKeys);
+        final KStream<String, String> valuesToLowercase = FilterService.valuesToLowercase(stream);
+        final KStream<String, String> splitValues = FilterService.splitValues(valuesToLowercase);
+        final KStream<String, String> assignKeys = FilterService.assignKeys(splitValues);
+        final KGroupedStream<String, String> groupByKey = FilterService.groupByKey(assignKeys);
 
-        return countKeys(groupByKey);
+        return FilterService.countKeys(groupByKey);
     }
 
     public static void writeFilteredStreamToKafka(final KTable<String, Long> filteredStream) {
@@ -44,7 +42,7 @@ public class WordCountService {
 
     public static KafkaStreams createKafkaStream(final StreamsBuilder streamsBuilder) {
 
-        return new KafkaStreams(streamsBuilder.build(), setProperties());
+        return new KafkaStreams(streamsBuilder.build(), PropertyService.setProperties());
     }
 
     public static void startKafkaStream(final KafkaStreams kafkaStreams) {
