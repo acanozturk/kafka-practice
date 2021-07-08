@@ -12,6 +12,7 @@
         <module name="kafka-basics" />
         <module name="kafka-connect-api" />
         <module name="kafka-consumer-elasticsearch" />
+        <module name="kafka-streams-2" />
       </profile>
     </annotationProcessing>
   </component>
