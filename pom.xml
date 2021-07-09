@@ -17,6 +17,7 @@
         <module>kafka-streams</module>
         <module>kafka-connect-api</module>
         <module>kafka-streams-2</module>
+        <module>kafka-streams-3</module>
     </modules>
 
     <properties>

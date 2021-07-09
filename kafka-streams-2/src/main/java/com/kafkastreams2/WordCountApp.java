@@ -8,7 +8,7 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 
 @Data
-final class WordCount {
+final class WordCountApp {
 
     public static void main(String[] args) {
         final StreamsBuilder streamsBuilder = WordCountService.createStreamsBuilder();
