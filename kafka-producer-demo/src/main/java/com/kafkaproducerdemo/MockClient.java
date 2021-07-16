@@ -15,8 +15,6 @@ import static net.andreinc.mockneat.types.enums.HostNameType.ADVERB_VERB;
 import static net.andreinc.mockneat.types.enums.URLSchemeType.HTTPS;
 
 @Data
-@EqualsAndHashCode
-@ToString
 public class MockClient {
 
     private final MockNeat mockNeat = MockNeat.threadLocal();
