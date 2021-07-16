@@ -11,6 +11,7 @@
         <module name="kafka-connect-api" />
         <module name="kafka-streams-2" />
         <module name="kafka-streams-3" />
+        <module name="kafka-streams-4" />
         <module name="kafka-producer-demo" />
         <module name="kafka-basics" />
         <module name="kafka-consumer-elasticsearch" />
