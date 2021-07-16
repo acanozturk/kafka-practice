@@ -22,11 +22,11 @@ public class BankBalanceFilterService {
             final ObjectNode initialBalance) {
 
         return stream.aggregate(() -> initialBalance,
-                (key, transaction, balance) -> createBalance(transaction, balance),
+                (key, transaction, balance) -> updateBalance(transaction, balance),
                 Materialized.with(STRING_SERDE, JSON_SERDE));
     }
 
-    private static JsonNode createBalance(final JsonNode transaction, final JsonNode balance) {
+    private static JsonNode updateBalance(final JsonNode transaction, final JsonNode balance) {
         final ObjectNode updatedBalance = JsonNodeFactory.instance.objectNode();
 
         final Integer count = getCount(balance);
